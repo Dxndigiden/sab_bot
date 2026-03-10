@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sab_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sab}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sab_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-sab_tournament}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sab} -d ${POSTGRES_DB:-sab_tournament}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  bot:
+    build: .
+    container_name: sab_bot
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      USE_POSTGRES: "true"
+      POSTGRES_HOST: postgres
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  postgres_data:
