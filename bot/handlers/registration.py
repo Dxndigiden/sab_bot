@@ -9,7 +9,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from loguru import logger
 
-from bot.keyboards import phone_keyboard, main_menu, registered_menu
+from bot.keyboards import phone_keyboard, main_menu, registered_menu, sab_link_keyboard
 from bot.states import RegistrationState
 from core.config import settings
 from database.crud import (
@@ -157,6 +157,7 @@ async def _handle_player(
         reply_markup=main_menu(is_admin=is_admin, can_register=False),
         parse_mode='HTML',
     )
+    await message.answer('👇 Следите за новостями турнира:', reply_markup=sab_link_keyboard())
     await state.clear()
 
 
@@ -205,3 +206,4 @@ async def my_team(message: Message) -> None:
         await message.answer('Вы ещё не зарегистрированы. Нажмите «📝 Регистрация».')
         return
     await message.answer(_fmt_team_card(team), parse_mode='HTML')
+    await message.answer('👇 Следите за новостями турнира:', reply_markup=sab_link_keyboard())

@@ -1,6 +1,9 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
+_SAB_URL = 'https://t.me/souze_ab'
+
+
 def confirm_keyboard() -> InlineKeyboardMarkup:
     """Кнопки подтверждения/отказа для участника."""
     return InlineKeyboardMarkup(
@@ -44,3 +47,14 @@ def delete_team_keyboard(teams) -> InlineKeyboardMarkup:
     ]
     rows.append([InlineKeyboardButton(text='↩️ Назад', callback_data='admin_back')])
     return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def sab_link_keyboard() -> InlineKeyboardMarkup:
+    """Inline-кнопка со ссылкой на паблик — появляется под карточкой команды."""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text='📣 Актуальная инфа в SAB', url=_SAB_URL),
+            ]
+        ]
+    )
