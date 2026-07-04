@@ -48,15 +48,22 @@ async def get_unconfirmed_teams() -> list[Team]:
 
 
 async def search_teams(query: str) -> list[Team]:
-    """Поиск по названию команды или имени капитана."""
-    q = f'%{query.lower()}%'
+    """Поиск по названию команды или имени капитана.
+
+    Фильтрация сделана на стороне Python, а не через SQL LOWER(),
+    потому что встроенный LOWER() в SQLite не работает с кириллицей
+    (только с ASCII) — из-за этого поиск с SQLite давал ложные "не найдено".
+    """
+    q = query.lower().strip()
     async with Session() as s:
-        result = await s.execute(
-            select(Team).where(
-                func.lower(Team.team_name).like(q) | func.lower(Team.captain_name).like(q)
-            )
-        )
-        return list(result.scalars().all())
+        result = await s.execute(select(Team))
+        teams = result.scalars().all()
+
+    return [
+        t
+        for t in teams
+        if q in (t.team_name or '').lower() or q in (t.captain_name or '').lower()
+    ]
 
 
 async def get_stats() -> dict:
